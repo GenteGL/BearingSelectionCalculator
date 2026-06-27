@@ -9,7 +9,8 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    loadBearings(); // загружаем CSV при запуске
+    loadBearings();
+    qDebug() << bearings.size();
     connect(ui->calculateButton, &QPushButton::clicked, this, &MainWindow::onCalculateClicked);
 }
 
@@ -20,7 +21,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadBearings()
 {
-    QFile file("bearings.csv");
+    QFile file(":/data/bearings.csv");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
