@@ -11,10 +11,17 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-// Структура подшипника — переезжает сюда из старого main.cpp
+// Структура подшипника.
+// e, X, Y, p берутся прямо из каталога производителя (хранятся в CSV),
+// а не вычисляются по общей таблице — так точнее и проще поддерживать.
 struct Bearing {
     std::string number;
-    double d, D, B, C, C0;
+    double d, D, B;   // геометрия, мм
+    double C, C0;      // динамическая и статическая грузоподъёмность, Н
+    double e;           // предельное отношение Fa/Fr
+    double X;           // коэффициент радиальной нагрузки (при Fa/Fr > e)
+    double Y;           // коэффициент осевой нагрузки (при Fa/Fr > e)
+    double p;           // показатель степени кривой усталости (3 — шариковые, 10/3 — роликовые)
 };
 
 class MainWindow : public QMainWindow
@@ -31,7 +38,12 @@ private slots:
 private:
     Ui::MainWindow *ui;
     std::vector<Bearing> bearings; // список всех подшипников из CSV
-    void loadBearings();           // функция загрузки CSV
+
+    void loadBearings(); // функция загрузки CSV
+
+    // Возвращает true и заполняет outValue, если текст — корректное
+    // неотрицательное число. Используется для валидации полей ввода.
+    bool parsePositiveDouble(const QString &text, double &outValue, const QString &fieldName, QString &errorMessage);
 };
 
 #endif // MAINWINDOW_H

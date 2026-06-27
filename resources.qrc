@@ -1,1 +1,5 @@
-<RCC/>
+<RCC>
+    <qresource prefix="/data">
+        <file>bearings.csv</file>
+    </qresource>
+</RCC>
