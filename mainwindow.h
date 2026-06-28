@@ -2,8 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QString>
 #include <vector>
 #include <string>
+
+class QLabel;
+class QLineEdit;
+class QPushButton;
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -11,17 +16,15 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-// Структура подшипника.
-// e, X, Y, p берутся прямо из каталога производителя (хранятся в CSV),
-// а не вычисляются по общей таблице — так точнее и проще поддерживать.
 struct Bearing {
     std::string number;
-    double d, D, B;   // геометрия, мм
-    double C, C0;      // динамическая и статическая грузоподъёмность, Н
-    double e;           // предельное отношение Fa/Fr
-    double X;           // коэффициент радиальной нагрузки (при Fa/Fr > e)
-    double Y;           // коэффициент осевой нагрузки (при Fa/Fr > e)
-    double p;           // показатель степени кривой усталости (3 — шариковые, 10/3 — роликовые)
+    double d;
+    double D;
+    double B;
+    double C;
+    double C0;
+    double f0;
+    double p;
 };
 
 class MainWindow : public QMainWindow
@@ -33,17 +36,34 @@ public:
     ~MainWindow() override;
 
 private slots:
-    void onCalculateClicked(); // функция которая сработает при нажатии кнопки
+    void onCalculateClicked();
 
 private:
     Ui::MainWindow *ui;
-    std::vector<Bearing> bearings; // список всех подшипников из CSV
+    std::vector<Bearing> bearings;
 
-    void loadBearings(); // функция загрузки CSV
+    QLineEdit *inputFr = nullptr;
+    QLineEdit *inputFa = nullptr;
+    QLineEdit *inputN = nullptr;
+    QLineEdit *inputL10h = nullptr;
+    QPushButton *calculateButton = nullptr;
 
-    // Возвращает true и заполняет outValue, если текст — корректное
-    // неотрицательное число. Используется для валидации полей ввода.
+    QLabel *resultTitle = nullptr;
+    QLabel *resultBadge = nullptr;
+    QLabel *dimensionsLabel = nullptr;
+    QLabel *capacityValueLabel = nullptr;
+    QLabel *capacityNeedLabel = nullptr;
+    QLabel *resourceValueLabel = nullptr;
+    QLabel *noteTextLabel = nullptr;
+    QLabel *statusIconLabel = nullptr;
+
+    void setupModernUi();
+    void loadBearings();
+    void showError(const QString &message);
+    void showNoResult();
+    void showResult(const Bearing &bearing, double neededCapacity, double realResourceHours);
     bool parsePositiveDouble(const QString &text, double &outValue, const QString &fieldName, QString &errorMessage);
+    void getEandY(double t, double &e, double &Y);
 };
 
 #endif // MAINWINDOW_H
